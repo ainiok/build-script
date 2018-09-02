@@ -1,0 +1,25 @@
+#!/bin/bash
+./configure \
+--prefix=/usr/local/php \
+--with-config-file-path=/usr/local/php/etc \
+--with-config-file-scan-dir=/usr/local/php/etc/php.d \
+--enable-mysqlnd \
+--with-mysqli=mysqlnd --with-openssl \
+--with-pdo-mysql=mysqlnd \
+--enable-mbstring --enable-shmop \
+--with-freetype-dir \
+--with-gd --with-mhash \
+--with-jpeg-dir \
+--with-png-dir \
+--with-zlib=/usr/local/zlib \
+--with-libxml-dir=/usr \
+--enable-bcmath --enable-mbregex \
+--enable-xml  --enable-sockets --enable-soap \
+--enable-maintainer-zts \
+--enable-fileinfo  --with-bz2 \
+--enable-fpm \
+--with-curl --with-gettext \
+--enable-pcntl \
+--enable-opcache \
+--with-iconv --enable-zip --disable-debug \
+--disable-rpath
