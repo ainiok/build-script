@@ -285,6 +285,7 @@ function Install_Swoolelib()
 	cd hiredis-0.13.3
 	make -j ${JOBS}
 	make install
+	echo "/usr/local/lib" >> /etc/ld.so.conf
 	ldconfig
 }
 
@@ -298,6 +299,10 @@ function Install_Swoole()
 	/usr/local/php/bin/phpize
 	./configure	--enable-openssl --enable-http2 --enable-async-redis --enable-sockets
 	make clean && make -j ${JOBS} && sudo make install
+	#  配置 swoole 扩展
+	sed -i "s/^;.*extension_dir.*=.*\".\/\"/extension_dir = \"\/usr\/local\/php\/lib\/php\/extensions\/no-debug-zts-20170718\/\"/g" \
+	     /usr/local/php/etc/php-cli.ini
+    sed -i '/^;extension=curl/a\extension=swoole.so' /usr/local/php/etc/php-cli.ini
 }
 
 function Install_Composer()
