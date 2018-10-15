@@ -22,4 +22,5 @@
 --enable-pcntl \
 --enable-opcache \
 --with-iconv --enable-zip --disable-debug \
---disable-rpath
+--disable-rpath \
+--with-readline

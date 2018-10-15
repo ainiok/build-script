@@ -35,7 +35,8 @@ function Install_Apm()
 	yum -y install gcc gcc-c++ autoconf libtool automake make tcl
 	yum -y install gdb gmp-devel libmcrypt libmcrypt-devel libxslt libxslt-devel libxml2 libxml2-devel openssl \
                    openssl-devel libcurl libcurl-devel libpng libpng-devel freetype.x86_64 freetype-devel.x86_64 \
-				   libjpeg-turbo libjpeg-turbo-devel openldap openldap-devel bzip2 bzip2-devel perl perl-devel pcre pcre-devel
+				   libjpeg-turbo libjpeg-turbo-devel openldap openldap-devel bzip2 bzip2-devel perl perl-devel \
+				   pcre pcre-devel readline-devel
     yum install -y libaio-*
 	rpm -e --nodeps mariadb-libs-5.5.56-2.el7.x86_64
 	yum -y install nodejs
