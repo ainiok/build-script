@@ -36,6 +36,8 @@ function Install_Apm()
 	yum -y install gdb gmp-devel libmcrypt libmcrypt-devel libxslt libxslt-devel libxml2 libxml2-devel openssl \
                    openssl-devel libcurl libcurl-devel libpng libpng-devel freetype.x86_64 freetype-devel.x86_64 \
 				   libjpeg-turbo libjpeg-turbo-devel openldap openldap-devel bzip2 bzip2-devel perl perl-devel pcre pcre-devel
+    yum install -y libaio-*
+	rpm -e --nodeps mariadb-libs-5.5.56-2.el7.x86_64
 	yum -y install nodejs
 }
 
@@ -116,15 +118,13 @@ function Install_Nginx()
 	chmod 754 /lib/systemd/system/nginx.service
 	systemctl enable nginx.service
 	# 这里应该还要重命名配置文件 安装后验证
-	echo "end install nginx"
+	echo "Finish install nginx"
 	set +e
 	
 }
 
 function Install_Mariadb()
 {
-	yum install -y libaio-*
-	rpm -e --nodeps mariadb-libs-5.5.56-2.el7.x86_64
 	cd ${DOWNLOAD_PATH}
 	tar -zxf mariadb-${MARIADB_VERSION}-linux-x86_64.tar.gz
 	mv mariadb-${MARIADB_VERSION}-linux-x86_64 /usr/local/mysql
@@ -146,7 +146,31 @@ function Install_Mariadb()
     ln -sf /usr/local/mysql/bin/myisamchk /usr/bin/myisamchk
     ln -sf /usr/local/mysql/bin/mysqld_safe /usr/bin/mysqld_safe
     ln -sf /usr/local/mysql/bin/mysqlcheck /usr/bin/mysqlcheck
-	echo "end install mysql"
+	echo "Finish install mysql"
+}
+
+function Install_Mysql()
+{
+	set -e
+	cd ${DOWNLOAD_PATH}
+	wget http://zy-res.oss-cn-hangzhou.aliyuncs.com/mysql/mysql-5.7.17-linux-glibc2.5-x86_64.tar.gz
+	tar -xzvf mysql-5.7.17-linux-glibc2.5-x86_64.tar.gz && mv mysql-5.7.17-linux-glibc2.5-x86_64/* /usr/local/mysql/
+	mv mysql-5.7.17-linux-glibc2.5-x86_64 /usr/local/mysql
+	sudo groupadd mysql
+	sudo useradd -g mysql -s /sbin/nologin mysql
+	/usr/local/mysql/bin/mysqld --initialize-insecure --datadir=/usr/local/mysql/data/ --user=mysql
+	chown -R mysql:mysql /usr/local/mysql
+	cp -f /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+	chmod +x /etc/init.d/mysqld
+	echo "/etc/init.d/mysqld start" >> /etc/rc.d/rc.local
+	# 这一步也可以和上面一样用ls
+	sed -i 's/\$PATH:/&\/usr\/local\/mysql\/bin:\/usr\/local\/mysql\/bin:/' /root/.bash_profile
+	source /root/.bash_profile
+	/etc/init.d/mysqld start
+	sleep 30
+	mysqladmin -u root password 123456
+	echo "Finish install mysql"
+	set +e
 }
 
 function Install_Jpeg()
