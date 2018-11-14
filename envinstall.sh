@@ -340,6 +340,12 @@ function Redis_server()
 	sed -i 's/daemonize no/daemonize yes/' /etc/redis/redis.conf
 	sed -i "s/# requirepass foobared/requirepass ${REDIS_PASS}/" /etc/redis/redis.conf
 	cp -f ${CONFIG_PATH}/"redis" /etc/init.d/ && chmod +x /etc/init.d/redis
+	# 这种方式是 redis-server xxx.conf  自定义配置
+	sed -i "s/export PATH/PATH=\/usr\/local\/bin:\$PATH\nexport PATH/" /etc/profile
+	#  systemctl start|stop|restart  读取的配置文件在/etc/redis/redis.conf
+	cp -f ${CONFIG_PATH}/"redis.service" /lib/systemd/system
+	chmod 754 /lib/systemd/system/redis.service
+	systemctl enable redis.service
 }
 
 Install_Apm

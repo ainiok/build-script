@@ -1,0 +1,11 @@
+# systemd service file for Redis forking server
+
+[Unit]
+Description=Redis Server
+After=network.target
+[Service]
+Type=forking
+ExecStart=/etc/init.d/redis start
+ExecRestart=/etc/init.d/redis restart
+ExecStop=/etc/init.d/redis stop
+PrivateTmp=true
