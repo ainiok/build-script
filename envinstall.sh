@@ -167,9 +167,12 @@ function Install_Mysql()
 	# 这一步也可以和上面一样用ls
 	sed -i 's/\$PATH:/&\/usr\/local\/mysql\/bin:\/usr\/local\/mysql\/bin:/' /root/.bash_profile
 	source /root/.bash_profile
+	cp -f ${CONFIG_PATH}/"mysql.service" /lib/systemd/system
+	chmod 754 /lib/systemd/system/mysql.service
+	systemctl enable mysql.service
 	/etc/init.d/mysqld start
 	sleep 30
-	mysqladmin -u root password 123456
+	mysqladmin -u root password ${MYSQL_PASSWD}
 	echo "Finish install mysql"
 	set +e
 }
@@ -351,7 +354,9 @@ Install_Openssl
 
 Install_Nginx
 
-Install_Mariadb
+#Install_Mariadb
+
+Install_Mysql
 
 Install_Php
 

@@ -1,0 +1,23 @@
+# systemd service file for MySQL forking server
+
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Service]
+User=mysql
+Group=mysql
+
+Type=forking
+TimeoutSec=5min
+PermissionsStartOnly=true
+ExecStart=/etc/init.d/mysqld start
+ExecStop=/etc/init.d/mysqld start
+ExecReload=/etc/init.d/mysqld reload
+Restart=on-failure
+KillMode=process
+GuessMainPID=no
+RemainAfterExit=yes
