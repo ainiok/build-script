@@ -1,30 +1,42 @@
 #!/bin/bash
 
-set -xv
-exec > deploy.log 2>&1
 ############################################################
 #    @file  envinstall.sh
 #    @brief 安装环境
 #    @author xiaojin 2018/8/21
 ############################################################
-BUILD_PATH=`pwd`
+
+set -xv
+logdir=/var/log/deploy
+mkdir -p "${logdir}"
+logfile="${logdir}/deploy-$(date '+%Y-%m-%d_%H-%M')_pid_$$_rand_${RANDOM}.log"
+exec >> "${logfile}" 2>&1
+
+BUILD_PATH=`cd $(dirname $0); pwd -P`
 CONFIG_PATH=${BUILD_PATH}/"config"
-PHP_VERSION='7.2.9'
+# php 
+PHP_VERSION='7.2.15'
 PHP_CONFIG_PATH=${CONFIG_PATH}/"php.configure"
-NGINX_VERSION='1.14.0'
+# nginx
+NGINX_VERSION='1.14.2'
 NGINX_CONFIG_PATH=${CONFIG_PATH}/"nginx.configure"
-REDIS_VERSION='4.0.11'
+# redis
+REDIS_VERSION='4.0.13'
 # Redis 密码 这里修改了 config/redis 也要修改
 REDIS_PASS='123456'
+# mysql
 MYSQL_VERSION=''
-MARIADB_VERSION='10.2.17'
-MYSQL_SCRIPT=${BUILD_PATH}/"configmysql.sql"
-NODE_VERSION='8.11.4'
-DOWNLOAD_PATH="/usr/local/src"
 MYSQL_PASSWD='123456'
+MYSQL_SCRIPT=${BUILD_PATH}/"configmysql.sql"
+# mariadb
+MARIADB_VERSION='10.2.22'
+# nodejs
+NODE_VERSION='8.11.4'
+
+DOWNLOAD_PATH="/usr/local/src"
 PACKETS=${BUILD_PATH}/"packets"
 START_SERVICE=${BUILD_PATH}/"script/start_service.sh"
-JOBS=2 # cpu的核数 
+JOBS=`cat /proc/cpuinfo| grep "processor"| wc -l`
 
 
 function Install_Apm()
@@ -38,14 +50,13 @@ function Install_Apm()
 				   libjpeg-turbo libjpeg-turbo-devel openldap openldap-devel bzip2 bzip2-devel perl perl-devel \
 				   pcre pcre-devel readline-devel
     yum install -y libaio-*
-	rpm -e --nodeps mariadb-libs-5.5.56-2.el7.x86_64
+	rpm -e --nodeps mariadb-libs-*
 	yum -y install nodejs
 }
 
 function Download_Lnmp()
 {
 	cd ${DOWNLOAD_PATH}
-	
 	echo "Download Nginx"
 	wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 	echo "Download Mariadb"
@@ -72,11 +83,9 @@ function Install_Pcre()
 
 function Install_Zlib()
 {
-	cd ${PACKETS}
+	cd ${DOWNLOAD_PATH}
 	# 这里的版本如果修改了，config/nginx.configure 里面也要修改
-	tar -zxf zlib-1.2.11.tar.gz
-	mv -f zlib-1.2.11 ${DOWNLOAD_PATH}
-	cd ${DOWNLOAD_PATH}/"zlib-1.2.11"
+	tar -zxf zlib-1.2.11.tar.gz && cd zlib-1.2.11
 	./configure --prefix=/usr/local/zlib
 	echo "make zlib install"
 	make -j ${JOBS} && make install
@@ -96,7 +105,7 @@ function Install_Openssl()
 	ln -s /usr/local/openssl/include/openssl /usr/include/openssl
 	echo "/usr/local/openssl/lib" >> /etc/ld.so.conf
 	ldconfig -v
-	sleep 15
+	sleep 10
 	openssl version	
 	echo "end install openssl"
 }
@@ -174,14 +183,16 @@ function Install_Mysql()
 	sleep 30
 	mysqladmin -u root password ${MYSQL_PASSWD}
 	echo "Finish install mysql"
+	
+	Configure_Mysql
 	set +e
 }
 
 function Install_Jpeg()
 {
-	wget http://www.ijg.org/files/jpegsrc.v9c.tar.gz ${DOWNLOAD_PATH}
 	cd ${DOWNLOAD_PATH}
-	tar -zxvf jpegsr9c.zip
+	wget http://www.ijg.org/files/jpegsrc.v9c.tar.gz
+	tar -zxf jpegsrc.v9c.tar.gz
 	mkdir /usr/local/libjpeg
 	cd jpeg-9c/
 	./configure --prefix=/usr/local/libjpeg --enable-shared --enable-static
@@ -259,7 +270,6 @@ function Install_Phplib()
 	# phpredis  github:  https://github.com/phpredis/phpredis
 	# extensions=redis.so
 	echo "install phpredis"
-	cp ${PACKETS}/"phpredis-4.1.1.tar.gz" ${DOWNLOAD_PATH}
 	cd ${DOWNLOAD_PATH}
 	tar -zxf phpredis-4.1.1.tar.gz
 	mkdir /usr/local/phpredis
@@ -273,7 +283,7 @@ function Install_Swoolelib()
 {
 	echo "install swoole lib --- nghttp2"
 	# nghttp2  github: https://github.com/nghttp2/nghttp2
-	cd ${PACKETS}
+	cd ${DOWNLOAD_PATH}
 	tar -xf nghttp2-1.32.1.tar.bz2
 	mv nghttp2-1.32.1/ /usr/local/nghttp2
 	cd /usr/local/nghttp2
@@ -282,7 +292,6 @@ function Install_Swoolelib()
 	make libdir=/usr/lib64 install
 	
 	echo "install hredis"
-	cp ${PACKETS}/"hiredis-0.13.3.tar.gz" ${DOWNLOAD_PATH}
 	cd ${DOWNLOAD_PATH}
 	tar -zxf hiredis-0.13.3.tar.gz
 	cd hiredis-0.13.3
@@ -295,7 +304,6 @@ function Install_Swoolelib()
 function Install_Swoole()
 {
 	echo "install swoole"
-	cp ${PACKETS}/"swoole-src-4.0.4.tar.gz" ${DOWNLOAD_PATH}
 	cd ${DOWNLOAD_PATH}
 	tar -zxf swoole-src-4.0.4.tar.gz
 	cd swoole-src-4.0.4
@@ -360,11 +368,13 @@ Install_Openssl
 
 Install_Nginx
 
-#Install_Mariadb
+Install_Mariadb
 
-Install_Mysql
+#Install_Mysql
 
 Install_Php
+
+Install_Jpeg
 
 Install_Swoolelib
 
