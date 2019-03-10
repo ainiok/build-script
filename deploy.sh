@@ -57,18 +57,30 @@ function Install_Apm()
 function Download_Lnmp()
 {
 	cd ${DOWNLOAD_PATH}
-	echo "Download Nginx"
-	wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
-	echo "Download Mariadb"
-	wget https://mirrors.shu.edu.cn/mariadb//mariadb-${MARIADB_VERSION}/bintar-linux-x86_64/mariadb-${MARIADB_VERSION}-linux-x86_64.tar.gz
-	echo "Download PHP"
-	wget http://cn2.php.net/distributions/php-${PHP_VERSION}.tar.gz
-	echo "Download Redis"
-	wget http://download.redis.io/releases/redis-${REDIS_VERSION}.tar.gz
-	echo "Download pcre"
-	wget http://zy-res.oss-cn-hangzhou.aliyuncs.com/pcre/pcre-8.38.tar.gz
-	echo "Download Openssl1.0.2"
-	wget https://www.openssl.org/source/openssl-1.0.2p.tar.gz
+	if [ ! -e "nginx-${NGINX_VERSION}.tar.gz" ]; then
+		echo "Download Nginx"
+		wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
+	fi
+	if [ ! -e "nginx-${NGINX_VERSION}.tar.gz" ]; then
+		echo "Download Mariadb"
+		wget https://mirrors.shu.edu.cn/mariadb//mariadb-${MARIADB_VERSION}/bintar-linux-x86_64/mariadb-${MARIADB_VERSION}-linux-x86_64.tar.gz
+	fi
+	if [ ! -e "php-${PHP_VERSION}.tar.gz" ]; then
+		echo "Download PHP"
+		wget http://cn2.php.net/distributions/php-${PHP_VERSION}.tar.gz
+	fi
+	if [ ! -e "redis-${REDIS_VERSION}.tar.gz" ]; then
+		echo "Download Redis"
+		wget http://download.redis.io/releases/redis-${REDIS_VERSION}.tar.gz
+	fi
+	if [ ! -e "pcre-8.38.tar.gz" ]; then
+		echo "Download pcre"
+		wget http://zy-res.oss-cn-hangzhou.aliyuncs.com/pcre/pcre-8.38.tar.gz
+	fi
+	if [ ! -e "openssl-1.0.2p.tar.gz" ]; then
+		echo "Download Openssl1.0.2"
+		wget https://www.openssl.org/source/openssl-1.0.2p.tar.gz
+	fi
 }
 
 function Install_Pcre()
@@ -308,7 +320,7 @@ function Install_Swoole()
 	tar -zxf swoole-v4.3.0.tar.gz
 	cd swoole
 	/usr/local/php/bin/phpize
-	./configure	--enable-openssl --enable-http2 --enable-async-redis --enable-sockets
+	./configure	--enable-openssl --enable-http2 --enable-sockets
 	make clean && make -j ${JOBS} && sudo make install
 	#  配置 swoole 扩展
 	sed -i "s/^;.*extension_dir.*=.*\".\/\"/extension_dir = \"\/usr\/local\/php\/lib\/php\/extensions\/no-debug-zts-20170718\/\"/g" \
