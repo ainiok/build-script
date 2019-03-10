@@ -305,8 +305,8 @@ function Install_Swoole()
 {
 	echo "install swoole"
 	cd ${DOWNLOAD_PATH}
-	tar -zxf swoole-src-4.0.4.tar.gz
-	cd swoole-src-4.0.4
+	tar -zxf swoole-v4.3.0.tar.gz
+	cd swoole
 	/usr/local/php/bin/phpize
 	./configure	--enable-openssl --enable-http2 --enable-async-redis --enable-sockets
 	make clean && make -j ${JOBS} && sudo make install
