@@ -138,6 +138,7 @@ function Install_Nginx()
 	#mkdir -pv /var/tmp/nginx/{client,proxy,fastcgi,uwsgi,scgi}
 	cp ${CONFIG_PATH}/"nginx.service" /lib/systemd/system
 	chmod 754 /lib/systemd/system/nginx.service
+	sed "s/#user.*nobody;/user  www/g" /usr/local/nginx/conf/nginx.conf
 	systemctl enable nginx.service
 	# 这里应该还要重命名配置文件 安装后验证
 	echo "Finish install nginx"
@@ -247,7 +248,8 @@ function Install_Php()
 	sed -i 's@;pid = run/php-fpm.pid@pid = /usr/local/php/var/run/php-fpm.pid@' php-fpm.conf
 	cd /usr/local/php/etc/php-fpm.d
 	cp -f www.conf.default www.conf
-	
+	sed -i "s/^user.*=.*nobody/user = www/g" www.conf
+	sed -i "s/^group.*=.*nobody/group = www/g" www.conf
 	##########################
 	#   更改运行PHP的用户  www.conf
     #
