@@ -52,6 +52,11 @@ function Install_Apm()
     yum install -y libaio-*
 	rpm -e --nodeps mariadb-libs-*
 	yum -y install nodejs
+	
+	sudo groupadd www
+	sudo useradd -g www -s /sbin/nologin www
+	sudo groupadd -r nginx
+	sudo useradd -r -g nginx nginx
 }
 
 function Download_Lnmp()
@@ -126,8 +131,6 @@ function Install_Nginx()
 {
 	set -e
 	Install_Pcre
-	sudo groupadd -r nginx
-	sudo useradd -r -g nginx nginx
 	cd ${DOWNLOAD_PATH}
 	tar -zxf nginx-${NGINX_VERSION}.tar.gz
 	cd nginx-${NGINX_VERSION}
@@ -216,9 +219,6 @@ function Install_Jpeg()
 function Install_Php()
 {
     set -e
-	groupadd www
-	useradd -g www -s /sbin/nologin www
-	
 	cd ${DOWNLOAD_PATH}
 	tar -zxf php-${PHP_VERSION}.tar.gz
 	cd php-${PHP_VERSION}
