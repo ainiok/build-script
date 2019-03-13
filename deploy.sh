@@ -141,7 +141,6 @@ function Install_Nginx()
 	#mkdir -pv /var/tmp/nginx/{client,proxy,fastcgi,uwsgi,scgi}
 	cp ${CONFIG_PATH}/"nginx.service" /lib/systemd/system
 	chmod 754 /lib/systemd/system/nginx.service
-	sed "s/#user.*nobody;/user  www/g" /usr/local/nginx/conf/nginx.conf
 	systemctl enable nginx.service
 	# 这里应该还要重命名配置文件 安装后验证
 	echo "Finish install nginx"
