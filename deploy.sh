@@ -57,6 +57,9 @@ function Install_Apm()
 	sudo useradd -g www -s /sbin/nologin www
 	sudo groupadd -r nginx
 	sudo useradd -r -g nginx nginx
+	
+	if rpm -qa |grep mariadb > /dev/null; then
+	fi
 }
 
 function Download_Lnmp()
@@ -66,7 +69,7 @@ function Download_Lnmp()
 		echo "Download Nginx"
 		wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 	fi
-	if [ ! -e "nginx-${NGINX_VERSION}.tar.gz" ]; then
+	if [ ! -e "mariadb-${MARIADB_VERSION}.tar.gz" ]; then
 		echo "Download Mariadb"
 		wget https://mirrors.shu.edu.cn/mariadb//mariadb-${MARIADB_VERSION}/bintar-linux-x86_64/mariadb-${MARIADB_VERSION}-linux-x86_64.tar.gz
 	fi
@@ -249,6 +252,8 @@ function Install_Php()
 	cp -f www.conf.default www.conf
 	sed -i "s/^user.*=.*nobody/user = www/g" www.conf
 	sed -i "s/^group.*=.*nobody/group = www/g" www.conf
+	# 隐藏PHP版本
+	sed -i "s/^expose_php.*=.*On/expose_php = Off/g" /usr/local/php/etc/php.ini
 	##########################
 	#   更改运行PHP的用户  www.conf
     #
