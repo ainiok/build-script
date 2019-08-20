@@ -1,4 +1,5 @@
 #!/bin/bash
+# chkconfig: 2345 90 10
 #description: Redis server
 
 PORT=6379

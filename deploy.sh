@@ -41,6 +41,7 @@ JOBS=`cat /proc/cpuinfo| grep "processor"| wc -l`
 
 function Install_Apm()
 {
+	cp -f ${PACKETS}"/*" ${DOWNLOAD_PATH}
 	echo "start yum install"
 	yum -y update
 	yum -y groupinstall "Development tools"
@@ -58,12 +59,13 @@ function Install_Apm()
 	sudo groupadd -r nginx
 	sudo useradd -r -g nginx nginx
 	
-	if rpm -qa |grep mariadb > /dev/null; then
-	fi
+	#if rpm -qa |grep mariadb > /dev/null; then
+	#fi
 }
 
 function Download_Lnmp()
 {
+	cp -f ${PACKETS}"/*" ${DOWNLOAD_PATH}
 	cd ${DOWNLOAD_PATH}
 	if [ ! -e "nginx-${NGINX_VERSION}.tar.gz" ]; then
 		echo "Download Nginx"
